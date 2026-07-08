@@ -1,0 +1,40 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-lg-6 mx-auto">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pb-0">
+                <h4 class="card-title mb-2">My Profile</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('villager.profile') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label text-muted">Username (Cannot be changed)</label>
+                        <input type="text" class="form-control bg-light" id="username" value="{{ current_user.username }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="aadhaar" class="form-label text-muted">Aadhaar Number (Cannot be changed)</label>
+                        <input type="text" class="form-control bg-light" id="aadhaar" value="{{ villager.aadhaar }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name" value="{{ villager.full_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="mobile" class="form-label">Mobile Number</label>
+                        <input type="text" class="form-control" id="mobile" name="mobile" value="{{ villager.mobile }}" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea class="form-control" id="address" name="address" rows="3" required>{{ villager.address }}</textarea>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-2"></i> Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

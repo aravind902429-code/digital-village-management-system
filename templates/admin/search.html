@@ -1,0 +1,181 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="mb-4">
+    <h4 class="mb-0 text-primary"><i class="fa-solid fa-search me-2"></i>Global Portal Search</h4>
+    <small class="text-muted">Search instantly across villagers, certificates, complaints, and welfare schemes</small>
+</div>
+
+<!-- Search Input Form -->
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body p-4">
+        <form action="{{ url_for('admin.search') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control form-control-lg" placeholder="Search by name, Aadhaar, keyword, type, or subject..." value="{{ q }}" required>
+            <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-search me-2"></i>Search</button>
+            {% if q %}
+            <a href="{{ url_for('admin.search') }}" class="btn btn-outline-secondary d-flex align-items-center">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if q %}
+<!-- Search Results -->
+<div class="row g-4">
+    <!-- Villagers Results -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa-solid fa-users me-2 text-primary"></i>Villagers Matching "{{ q }}" <span class="badge bg-primary ms-2">{{ results.villagers|length }}</span></h5>
+            </div>
+            <div class="card-body p-0">
+                {% if results.villagers %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>ID</th><th>Full Name</th><th>Mobile</th><th>Address</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for v in results.villagers %}
+                            <tr><td>#{{ v.id }}</td><td><strong>{{ v.full_name }}</strong></td><td>{{ v.mobile }}</td><td>{{ v.address }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">No matching villagers found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Certificates Results -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa-solid fa-file-contract me-2 text-warning"></i>Certificates Matching "{{ q }}" <span class="badge bg-warning text-dark ms-2">{{ results.certificates|length }}</span></h5>
+            </div>
+            <div class="card-body p-0">
+                {% if results.certificates %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>ID</th><th>Type</th><th>Applicant</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for c in results.certificates %}
+                            <tr><td>#{{ c.id }}</td><td><strong>{{ c.type }}</strong></td><td>{{ c.applicant_name }}</td><td><span class="badge bg-secondary">{{ c.status }}</span></td><td><a href="{{ url_for('admin.certificates') }}" class="btn btn-sm btn-outline-primary">View in Module</a></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">No matching certificates found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Complaints Results -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa-solid fa-exclamation-triangle me-2 text-danger"></i>Complaints Matching "{{ q }}" <span class="badge bg-danger ms-2">{{ results.complaints|length }}</span></h5>
+            </div>
+            <div class="card-body p-0">
+                {% if results.complaints %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>ID</th><th>Category</th><th>Description</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for cm in results.complaints %}
+                            <tr><td>#{{ cm.id }}</td><td><strong>{{ cm.category }}</strong></td><td>{{ cm.description[:60] }}...</td><td><span class="badge bg-secondary">{{ cm.status }}</span></td><td><a href="{{ url_for('admin.complaints') }}" class="btn btn-sm btn-outline-danger">View in Module</a></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">No matching complaints found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Schemes Results -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa-solid fa-hand-holding-dollar me-2 text-success"></i>Schemes Matching "{{ q }}" <span class="badge bg-success ms-2">{{ results.schemes|length }}</span></h5>
+            </div>
+            <div class="card-body p-0">
+                {% if results.schemes %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr><th>ID</th><th>Title</th><th>Description</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for sc in results.schemes %}
+                            <tr><td>#{{ sc.id }}</td><td><strong>{{ sc.title }}</strong></td><td>{{ sc.description[:60] }}...</td><td>{% if sc.is_active %}<span class="badge bg-success">Active</span>{% else %}<span class="badge bg-secondary">Inactive</span>{% endif %}</td><td><a href="{{ url_for('admin.edit_scheme', id=sc.id) }}" class="btn btn-sm btn-outline-success">Edit Scheme</a></td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">No matching government schemes found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Taxes Results -->
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fa-solid fa-file-invoice-dollar me-2 text-info"></i>Tax Records Matching "{{ q }}" <span class="badge bg-info text-dark ms-2">{{ results.taxes|length }}</span></h5>
+            </div>
+            <div class="card-body p-0">
+                {% if results.taxes %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="table-light">
+                            <tr><th>ID</th><th>Villager</th><th>Tax Type</th><th>Amount</th><th>Status</th><th>Receipt No.</th><th>Action</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for tx in results.taxes %}
+                            <tr>
+                                <td>#{{ tx.id }}</td>
+                                <td><strong>{{ tx.villager.full_name }}</strong><br><small class="text-muted">{{ tx.villager.mobile }}</small></td>
+                                <td><span class="badge bg-light text-dark border">{{ tx.tax_type }}</span></td>
+                                <td class="fw-bold text-success">₹ {{ "{:,.2f}".format(tx.amount) }}</td>
+                                <td>
+                                    {% if tx.payment_status == 'Paid' %}<span class="badge bg-success">Paid</span>
+                                    {% elif tx.payment_status == 'Overdue' %}<span class="badge bg-danger">Overdue</span>
+                                    {% else %}<span class="badge bg-warning text-dark">Unpaid</span>{% endif %}
+                                </td>
+                                <td><code>{{ tx.receipt_number or 'N/A' }}</code></td>
+                                <td><a href="{{ url_for('admin.edit_tax', id=tx.id) }}" class="btn btn-sm btn-outline-primary">Edit Record</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted text-center py-3 mb-0">No matching tax records found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="card shadow-sm border-0 py-5 text-center">
+    <div class="card-body text-muted">
+        <i class="fa-solid fa-search fa-4x mb-3 text-light"></i>
+        <h5>Enter a Keyword to Start Search</h5>
+        <p>You can search across all villagers, applications, complaints, welfare schemes, and tax records simultaneously.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

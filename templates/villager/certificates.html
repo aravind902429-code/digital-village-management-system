@@ -1,0 +1,83 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">My Certificates</h4>
+    <a href="{{ url_for('villager.apply_certificate') }}" class="btn btn-success">
+        <i class="fa-solid fa-plus me-2"></i>Apply for Certificate
+    </a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Application ID</th>
+                        <th>Type</th>
+                        <th>Date Applied</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cert in certificates %}
+                    <tr>
+                        <td>#{{ cert.id }}</td>
+                        <td>{{ cert.type }}</td>
+                        <td>{{ cert.submission_date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if cert.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif cert.status == 'Approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#certModal{{ cert.id }}">
+                                Details
+                            </button>
+                            {% if cert.status == 'Approved' %}
+                            <a href="{{ url_for('villager.acknowledgement', id=cert.id) }}" class="btn btn-sm btn-outline-success" target="_blank">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <!-- Details Modal -->
+                    <div class="modal fade" id="certModal{{ cert.id }}" tabindex="-1" aria-labelledby="certModalLabel{{ cert.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="certModalLabel{{ cert.id }}">Certificate Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Type:</strong> {{ cert.type }}</p>
+                                    <p><strong>Applicant Name:</strong> {{ cert.applicant_name }}</p>
+                                    <p><strong>Status:</strong> {{ cert.status }}</p>
+                                    {% if cert.remarks %}
+                                        <p><strong>Remarks:</strong><br>{{ cert.remarks }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">You have not applied for any certificates yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm border-0 border-top border-primary border-3">
+            <div class="card-header bg-white pb-0">
+                <h4 class="card-title mb-2">Edit Tax Record #{{ tax.id }}</h4>
+                <small class="text-muted">Resident: <strong>{{ tax.villager.full_name }}</strong> (Mobile: {{ tax.villager.mobile }})</small>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('admin.edit_tax', id=tax.id) }}" method="POST">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="tax_type" class="form-label fw-bold">Tax Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="tax_type" name="tax_type" required>
+                                <option value="Property Tax" {% if tax.tax_type == 'Property Tax' %}selected{% endif %}>Property Tax</option>
+                                <option value="House Tax" {% if tax.tax_type == 'House Tax' %}selected{% endif %}>House Tax</option>
+                                <option value="Water Tax" {% if tax.tax_type == 'Water Tax' %}selected{% endif %}>Water Tax</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="amount" class="form-label fw-bold">Tax Amount Payable (Rs) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" step="0.01" min="1" class="form-control" id="amount" name="amount" value="{{ tax.amount }}" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="due_date" class="form-label fw-bold">Payment Due Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="due_date" name="due_date" value="{{ tax.due_date.strftime('%Y-%m-%d') }}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="payment_status" class="form-label fw-bold">Payment Status <span class="text-danger">*</span></label>
+                            <select class="form-select" id="payment_status" name="payment_status" required>
+                                <option value="Unpaid" {% if tax.payment_status == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+                                <option value="Paid" {% if tax.payment_status == 'Paid' %}selected{% endif %}>Paid</option>
+                                <option value="Overdue" {% if tax.payment_status == 'Overdue' %}selected{% endif %}>Overdue</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="remarks" class="form-label fw-bold">Administrative Remarks / Notes</label>
+                        <textarea class="form-control" id="remarks" name="remarks" rows="3">{{ tax.remarks }}</textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.taxes') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-1"></i> Update Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

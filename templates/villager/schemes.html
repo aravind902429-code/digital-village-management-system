@@ -1,0 +1,82 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0">Government Schemes & Subsidies</h4>
+        <small class="text-muted">Explore welfare schemes and check your eligibility</small>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('villager.favourites') }}" class="btn btn-outline-danger">
+            <i class="fa-solid fa-heart me-1"></i> Saved Schemes
+        </a>
+    </div>
+</div>
+
+<!-- Search Bar -->
+<div class="card shadow-sm border-0 mb-4 bg-light">
+    <div class="card-body">
+        <form action="{{ url_for('villager.schemes') }}" method="GET" class="d-flex gap-2">
+            <input type="text" name="q" class="form-control" placeholder="Search schemes by keyword..." value="{{ request.args.get('q', '') }}">
+            <button type="submit" class="btn btn-success"><i class="fa-solid fa-search me-1"></i> Search</button>
+            {% if request.args.get('q') %}
+            <a href="{{ url_for('villager.schemes') }}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Schemes Grid -->
+<div class="row g-4">
+    {% for scheme in schemes %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm border-0 h-100 d-flex flex-column">
+            {% if scheme.image_filename %}
+            <img src="{{ url_for('admin.uploaded_file', filename=scheme.image_filename) }}" class="card-img-top" alt="{{ scheme.title }}" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="bg-success text-white d-flex align-items-center justify-content-center" style="height: 180px;">
+                <i class="fa-solid fa-hand-holding-dollar fa-4x opacity-50"></i>
+            </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">{{ scheme.title }}</h5>
+                </div>
+                <p class="card-text text-muted small flex-grow-1">{{ scheme.description[:120] }}...</p>
+                
+                <hr class="my-2">
+                <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                    <a href="{{ url_for('villager.scheme_details', id=scheme.id) }}" class="btn btn-sm btn-outline-success">
+                        View Eligibility & Benefits
+                    </a>
+                    
+                    <form action="{{ url_for('villager.toggle_favourite', id=scheme.id) }}" method="POST" class="d-inline">
+                        <input type="hidden" name="next" value="{{ request.url }}">
+                        {% if scheme in villager.favourite_schemes.all() %}
+                        <button type="submit" class="btn btn-sm btn-danger" title="Remove from Favourites">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                        {% else %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Save to Favourites">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-12">
+        <div class="card shadow-sm border-0 py-5 text-center">
+            <div class="card-body text-muted">
+                <i class="fa-solid fa-folder-open fa-3x mb-3 text-secondary"></i>
+                <h5>No Government Schemes Found</h5>
+                <p>We couldn't find any schemes matching your criteria right now.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

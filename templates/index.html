@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm border border-success">
+    <div class="container-fluid py-5 text-center">
+        <h1 class="display-5 fw-bold text-success">Welcome to Digital Village</h1>
+        <p class="col-md-8 mx-auto fs-4">Empowering our community with digital services. Apply for certificates, submit complaints, and stay updated with government schemes.</p>
+        {% if not current_user.is_authenticated %}
+            <a class="btn btn-success btn-lg mt-3" href="{{ url_for('auth.register') }}" role="button">Join Now</a>
+            <a class="btn btn-outline-success btn-lg mt-3 ms-2" href="{{ url_for('auth.login') }}" role="button">Login</a>
+        {% else %}
+            {% if current_user.role == 'admin' %}
+                <a class="btn btn-primary btn-lg mt-3" href="#" role="button">Admin Dashboard</a>
+            {% else %}
+                <a class="btn btn-primary btn-lg mt-3" href="{{ url_for('villager.dashboard') }}" role="button">Villager Dashboard</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

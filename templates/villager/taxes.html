@@ -1,0 +1,150 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="mb-0 text-dark"><i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>My Village Taxes & Bills</h4>
+        <small class="text-muted">View Property Tax, House Tax, Water Tax, check due dates, and make secure online payments</small>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-3">
+        <div class="card shadow-sm border-0 bg-dark text-white h-100">
+            <div class="card-body">
+                <h6 class="card-title text-white-50">Total Amount Payable</h6>
+                <h2 class="mb-0 text-warning">₹ {{ "{:,.2f}".format(total_due) }}</h2>
+                <small class="text-light">All Unpaid / Overdue Bills</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-1"><i class="fa-solid fa-home me-1 text-success"></i>Property Tax Due</h6>
+                <h3 class="mb-0 fw-bold">₹ {{ "{:,.2f}".format(prop_tax) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-1"><i class="fa-solid fa-house-user me-1 text-info"></i>House Tax Due</h6>
+                <h3 class="mb-0 fw-bold">₹ {{ "{:,.2f}".format(house_tax) }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <h6 class="text-muted mb-1"><i class="fa-solid fa-faucet-drip me-1 text-primary"></i>Water Tax Due</h6>
+                <h3 class="mb-0 fw-bold">₹ {{ "{:,.2f}".format(water_tax) }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending / Unpaid Bills Section -->
+<div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-warning bg-opacity-25 py-3">
+        <h6 class="mb-0 fw-bold text-dark"><i class="fa-solid fa-exclamation-circle me-2 text-danger"></i>Pending & Overdue Tax Bills <span class="badge bg-danger ms-1">{{ unpaid_taxes|length }}</span></h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tax Type</th>
+                        <th>Amount Payable</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Remarks</th>
+                        <th>Online Payment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in unpaid_taxes %}
+                    <tr>
+                        <td><strong>{{ t.tax_type }}</strong></td>
+                        <td class="fw-bold text-danger fs-5">₹ {{ "{:,.2f}".format(t.amount) }}</td>
+                        <td>
+                            <span class="fw-bold">{{ t.due_date.strftime('%d-%m-%Y') }}</span>
+                            {% if t.payment_status == 'Overdue' %}
+                            <br><small class="text-danger fw-bold"><i class="fa-solid fa-clock me-1"></i>Passed Due Date</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if t.payment_status == 'Overdue' %}
+                                <span class="badge bg-danger px-3 py-2"><i class="fa-solid fa-exclamation-triangle me-1"></i>Overdue</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark px-3 py-2"><i class="fa-regular fa-clock me-1"></i>Unpaid</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-muted small">{{ t.remarks or 'Regular Assessment Bill' }}</td>
+                        <td>
+                            <form action="{{ url_for('villager.pay_tax', id=t.id) }}" method="POST" onsubmit="return confirm('Demo Online Payment: Proceed to pay Rs. {{ t.amount }} for {{ t.tax_type }}?');">
+                                <button type="submit" class="btn btn-success fw-bold px-3">
+                                    <i class="fa-solid fa-credit-card me-2"></i>Demo Online Pay
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="fa-solid fa-check-circle fa-3x text-success mb-3"></i>
+                            <h6 class="fw-bold text-dark">All Tax Bills Are Paid!</h6>
+                            <p class="mb-0">You have no outstanding Property, House, or Water taxes due at this time.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Previous Payments History & Receipts Section -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <h6 class="mb-0 fw-bold"><i class="fa-solid fa-history me-2 text-success"></i>Previous Tax Payments & Download Receipts <span class="badge bg-success ms-1">{{ paid_taxes|length }}</span></h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Receipt Number</th>
+                        <th>Tax Type</th>
+                        <th>Amount Paid</th>
+                        <th>Payment Date</th>
+                        <th>Status</th>
+                        <th>Official Receipt</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in paid_taxes %}
+                    <tr>
+                        <td><code class="text-success fw-bold fs-6">{{ p.receipt_number }}</code></td>
+                        <td><strong>{{ p.tax_type }}</strong></td>
+                        <td class="fw-bold text-success">₹ {{ "{:,.2f}".format(p.amount) }}</td>
+                        <td>{% if p.payment_date %}{{ p.payment_date.strftime('%d-%m-%Y %H:%M') }}{% else %}{{ p.updated_at.strftime('%d-%m-%Y') }}{% endif %}</td>
+                        <td><span class="badge bg-success px-3 py-2"><i class="fa-solid fa-check-circle me-1"></i>Paid</span></td>
+                        <td>
+                            <a href="{{ url_for('villager.tax_receipt', id=p.id) }}" target="_blank" class="btn btn-sm btn-outline-danger fw-bold">
+                                <i class="fa-solid fa-file-pdf me-1"></i> Download Receipt (PDF)
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">No past tax payment history recorded.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

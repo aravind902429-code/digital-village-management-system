@@ -1,0 +1,72 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm border-0 border-top border-primary border-3">
+            <div class="card-header bg-white pb-0">
+                <h4 class="card-title mb-2"><i class="fa-solid fa-pen-to-square me-2 text-primary"></i>Edit Announcement #{{ announcement.id }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('admin.edit_announcement', id=announcement.id) }}" method="POST" enctype="multipart/form-data">
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="title" class="form-label fw-bold">Announcement Title / Subject <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ announcement.title }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="category" class="form-label fw-bold">Category</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="General" {% if announcement.category == 'General' %}selected{% endif %}>General</option>
+                                <option value="Urgent" {% if announcement.category == 'Urgent' %}selected{% endif %}>Urgent / Emergency</option>
+                                <option value="Health" {% if announcement.category == 'Health' %}selected{% endif %}>Health & Sanitation</option>
+                                <option value="Education" {% if announcement.category == 'Education' %}selected{% endif %}>Education</option>
+                                <option value="Agriculture" {% if announcement.category == 'Agriculture' %}selected{% endif %}>Agriculture</option>
+                                <option value="Scheme" {% if announcement.category == 'Scheme' %}selected{% endif %}>Govt Schemes</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label fw-bold">Detailed Notice Content <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="content" name="content" rows="5" required>{{ announcement.content }}</textarea>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="scheduled_date" class="form-label fw-bold"><i class="fa-solid fa-calendar-clock me-1"></i>Schedule Release Date/Time</label>
+                            <input type="datetime-local" class="form-control" id="scheduled_date" name="scheduled_date" value="{% if announcement.scheduled_date %}{{ announcement.scheduled_date.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                            <small class="text-muted">Leave empty for immediate publication.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="attachment" class="form-label fw-bold"><i class="fa-solid fa-paperclip me-1"></i>Replace Attached File</label>
+                            <input type="file" class="form-control" id="attachment" name="attachment" accept=".pdf,.jpg,.jpeg,.png">
+                            {% if announcement.attachment_filename %}
+                            <small class="text-success"><i class="fa-solid fa-check me-1"></i>Current: {{ announcement.attachment_filename }}</small>
+                            {% else %}
+                            <small class="text-muted">No file currently attached.</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4 bg-light p-3 rounded">
+                        <div class="col-md-6 form-check mb-2 mb-md-0">
+                            <input type="checkbox" class="form-check-input" id="is_published" name="is_published" {% if announcement.is_published %}checked{% endif %}>
+                            <label class="form-check-label fw-bold" for="is_published">Published to Villager Dashboard</label>
+                        </div>
+                        <div class="col-md-6 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_pinned" name="is_pinned" {% if announcement.is_pinned %}checked{% endif %}>
+                            <label class="form-check-label fw-bold text-danger" for="is_pinned"><i class="fa-solid fa-thumbtack me-1"></i>Pinned to top of announcements</label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.announcements') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4"><i class="fa-solid fa-save me-1"></i> Update Announcement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

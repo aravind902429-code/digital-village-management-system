@@ -1,0 +1,54 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card shadow-sm border-0 border-top border-primary border-3">
+            <div class="card-header bg-white pb-0">
+                <h4 class="card-title mb-2">Edit Government Scheme #{{ scheme.id }}</h4>
+            </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('admin.edit_scheme', id=scheme.id) }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Scheme Title</label>
+                        <input type="text" class="form-control" id="title" name="title" value="{{ scheme.title }}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Overview & Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required>{{ scheme.description }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="eligibility" class="form-label">Eligibility Criteria</label>
+                        <textarea class="form-control" id="eligibility" name="eligibility" rows="3" required>{{ scheme.eligibility }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="benefits" class="form-label">Key Benefits</label>
+                        <textarea class="form-control" id="benefits" name="benefits" rows="3" required>{{ scheme.benefits }}</textarea>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if scheme.is_active %}checked{% endif %}>
+                        <label class="form-check-label" for="is_active">Scheme is Active</label>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="image" class="form-label">Upload New Banner / Image (Optional)</label>
+                        <input class="form-control" type="file" id="image" name="image" accept="image/*">
+                        {% if scheme.image_filename %}
+                        <div class="form-text">Current image: <a href="{{ url_for('admin.uploaded_file', filename=scheme.image_filename) }}" target="_blank">{{ scheme.image_filename }}</a></div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('admin.schemes') }}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4">Update Scheme</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

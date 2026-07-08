@@ -1,0 +1,114 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white pb-0 d-flex justify-content-between align-items-center">
+        <h4 class="card-title mb-2">Manage Complaints</h4>
+        <form class="d-flex" action="{{ url_for('admin.complaints') }}" method="GET">
+            <select name="status" class="form-select form-select-sm me-2" onchange="this.form.submit()">
+                <option value="">All Statuses</option>
+                <option value="Pending" {% if request.args.get('status') == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="In Progress" {% if request.args.get('status') == 'In Progress' %}selected{% endif %}>In Progress</option>
+                <option value="Resolved" {% if request.args.get('status') == 'Resolved' %}selected{% endif %}>Resolved</option>
+            </select>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Villager</th>
+                        <th>Category</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cmplt in complaints %}
+                    <tr>
+                        <td>#{{ cmplt.id }}</td>
+                        <td>{{ cmplt.villager.full_name }}<br><small class="text-muted">{{ cmplt.villager.mobile }}</small></td>
+                        <td>{{ cmplt.category }}</td>
+                        <td>{{ cmplt.date.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            {% if cmplt.status == 'Pending' %}
+                                <span class="badge bg-danger">Pending</span>
+                            {% elif cmplt.status == 'In Progress' %}
+                                <span class="badge bg-warning text-dark">In Progress</span>
+                            {% else %}
+                                <span class="badge bg-success">Resolved</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cmpltModal{{ cmplt.id }}">
+                                View & Update
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal for Complaint -->
+                    <div class="modal fade" id="cmpltModal{{ cmplt.id }}" tabindex="-1" aria-labelledby="cmpltModalLabel{{ cmplt.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <form action="{{ url_for('admin.update_complaint', id=cmplt.id) }}" method="POST">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="cmpltModalLabel{{ cmplt.id }}">Complaint #{{ cmplt.id }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <strong>Category:</strong> {{ cmplt.category }}<br>
+                                                <strong>Villager:</strong> {{ cmplt.villager.full_name }}<br>
+                                                <strong>Mobile:</strong> {{ cmplt.villager.mobile }}<br>
+                                                <strong>Address:</strong> {{ cmplt.villager.address }}<br>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong>Description:</strong><br>
+                                                {{ cmplt.description }}
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <strong>Attachment:</strong>
+                                            {% if cmplt.image_filename %}
+                                                <a href="{{ url_for('admin.uploaded_file', filename=cmplt.image_filename) }}" target="_blank">View Uploaded Image</a>
+                                            {% else %}
+                                                No image uploaded.
+                                            {% endif %}
+                                        </div>
+                                        <hr>
+                                        <div class="mb-3">
+                                            <label class="form-label">Status</label>
+                                            <select name="status" class="form-select" required>
+                                                <option value="Pending" {% if cmplt.status == 'Pending' %}selected{% endif %}>Pending</option>
+                                                <option value="In Progress" {% if cmplt.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                                <option value="Resolved" {% if cmplt.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Admin Remarks</label>
+                                            <textarea name="remarks" class="form-control" rows="2">{{ cmplt.remarks or '' }}</textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save changes</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No complaints found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

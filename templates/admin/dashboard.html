@@ -1,0 +1,88 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card shadow-sm border-0 bg-primary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Total Villagers</h6>
+                        <h2 class="mb-0">{{ villager_count }}</h2>
+                    </div>
+                    <i class="fa-solid fa-users fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card shadow-sm border-0 bg-warning text-dark h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-dark-50">Pending Certificates</h6>
+                        <h2 class="mb-0">{{ pending_certs }}</h2>
+                    </div>
+                    <i class="fa-solid fa-file-contract fa-2x text-dark-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card shadow-sm border-0 bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Pending Complaints</h6>
+                        <h2 class="mb-0">{{ pending_complaints }}</h2>
+                    </div>
+                    <i class="fa-solid fa-exclamation-triangle fa-2x text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-lg-3">
+        <div class="card shadow-sm border-0 bg-success text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Active Schemes</h6>
+                        <h2 class="mb-0">{{ active_schemes }}</h2>
+                    </div>
+                    <i class="fa-solid fa-hand-holding-dollar fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm border-0 bg-dark text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-white-50">Total Tax Bills Issued</h6>
+                        <h2 class="mb-0">{{ total_taxes|default(0) }}</h2>
+                        <a href="{{ url_for('admin.taxes') }}" class="text-info small text-decoration-none">Manage Taxes &rarr;</a>
+                    </div>
+                    <i class="fa-solid fa-file-invoice-dollar fa-3x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6">
+        <div class="card shadow-sm border-0 bg-info text-dark h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title text-dark-50">Total Tax Revenue Collected</h6>
+                        <h2 class="mb-0">₹ {{ "{:,.2f}".format(total_revenue|default(0.0)) }}</h2>
+                        <a href="{{ url_for('admin.tax_report') }}" class="text-dark small text-decoration-none fw-bold">View Tax Collection Report &rarr;</a>
+                    </div>
+                    <i class="fa-solid fa-coins fa-3x text-dark-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
